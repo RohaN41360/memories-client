@@ -1,0 +1,21 @@
+.empty-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: #555;
+    font-family: Arial, sans-serif;
+  }
+  
+  .empty-data__image {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .empty-data__text {
+    font-size: 18px;
+    text-align: center;
+  }
+      
