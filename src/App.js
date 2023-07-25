@@ -4,6 +4,7 @@ import './App.css';
 import UploadForm from './components/upload/upload';
 import Navbar from './components/navbar/Navbar';
 import Feed from './components/feed/feed';
+import Notfound from './components/notfound/Notfound';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/" element={<Feed />} />
         <Route path="/upload" element={<UploadForm />} />
         <Route path="/feed" element={<Feed />} />
+        <Route path="*" element={<Notfound />} />
       </Routes>
     </Router>
       
