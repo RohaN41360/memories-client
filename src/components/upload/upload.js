@@ -38,7 +38,8 @@ const UploadForm = () => {
       formData.append('name', name);
       formData.append('description', description);
 
-      await axios.post('http://localhost:5000/upload', formData, {
+      // http://localhost:5000 
+      await axios.post('https://memories-server-1iig.onrender.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './feed.css';
+import {Link} from 'react-router-dom'
 import LoadingSpinner from '../Loading/loading';
 import  Nodata  from '../NoData/Nodata';
 
@@ -23,7 +24,7 @@ const Feed = () => {
     
     try {
       
-      const response = await axios.get('http://localhost:5000/getposts'); 
+      const response = await axios.get('https://memories-server-1iig.onrender.com/getposts'); 
       setData(response.data);
       
     } catch (error) {
@@ -38,7 +39,7 @@ const Feed = () => {
     const newLikes = likes + 1;
     setLikes(newLikes); 
     
-    axios.patch(`http://localhost:5000/getposts/${id}`, { likes: newLikes })
+    axios.patch(`https://memories-server-1iig.onrender.com/getposts/${id}`, { likes: newLikes })
       .then(res => {
         // console.log(res.data) 
       })
@@ -48,7 +49,7 @@ const Feed = () => {
     const newLikes = likes - 1;
     setLikes(newLikes);
     
-    axios.patch(`http://localhost:5000/getposts/${id}`, { likes: newLikes })
+    axios.patch(`https://memories-server-1iig.onrender.com/getposts/${id}`, { likes: newLikes })
       .then(res => {
         console.log(res.data)
       })
@@ -60,7 +61,7 @@ const Feed = () => {
     const confirmed = window.confirm('Are you sure you want to delete this post?');
   if (confirmed) {
     try {
-      await axios.delete(`http://localhost:5000/delete/${id}`);
+      await axios.delete(`https://memories-server-1iig.onrender.com/delete/${id}`);
       fetchData();
     } catch (error) {
       console.error(error);
@@ -103,8 +104,8 @@ const Feed = () => {
           )}
     </div>   
     <img className="co-logo" src="http://placehold.it/40x40" alt='*' />
-    <div className="co-name"><a href="#">{post.name.charAt(0).toUpperCase() + post.name.slice(1)} Added a Post</a></div>
-    <div className="time"><a href="#">{post.createdAt.slice(2,10)}</a>  <i className="fa fa-globe"></i></div>
+    <div className="co-name"><Link>{post.name.charAt(0).toUpperCase() + post.name.slice(1)} Added a Post</Link></div>
+    <div className="time"><Link>{post.createdAt.slice(2,10)}</Link>  <i className="fa fa-globe"></i></div>
   </div>
   <div className="content">
     <p>{post.description}</p>
