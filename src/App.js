@@ -12,6 +12,7 @@ function App() {
       <Navbar />
      
       <Routes>
+      <Route path="/" element={<Feed />} />
         <Route path="/upload" element={<UploadForm />} />
         <Route path="/feed" element={<Feed />} />
       </Routes>
