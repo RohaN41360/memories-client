@@ -75,8 +75,9 @@ const UploadForm = () => {
             </div>
             <div className="input__box">
               <span className="details">Description</span>
-              <textarea
+              <input
                 id="description"
+
                 value={description}
                 onChange={handleDescriptionChange}
                 required
