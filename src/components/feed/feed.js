@@ -23,7 +23,7 @@ const Feed = () => {
   const fetchData = async () => {
     
     try {
-      
+      // https://memories-server-1iig.onrender.com
       const response = await axios.get('https://memories-server-1iig.onrender.com/getposts'); 
       setData(response.data);
       
@@ -51,7 +51,7 @@ const Feed = () => {
     
     axios.patch(`https://memories-server-1iig.onrender.com/getposts/${id}`, { likes: newLikes })
       .then(res => {
-        console.log(res.data)
+        // console.log(res.data)
       })
 
   }
@@ -75,7 +75,11 @@ const Feed = () => {
   
   if(isLoading)
   {
-    return(<LoadingSpinner />)
+    return(
+    <div>
+      <LoadingSpinner />
+    </div>
+    )
   }
 
   if(data.length === 0)
@@ -98,7 +102,7 @@ const Feed = () => {
       <i className="fa fa-chevron-down" onClick={handleToggleOptions} key={post.id}></i>
     {showOptions && (
             <div className="options-list" style={{color:'black'}} >
-              <div><i class="fa fa-edit">&nbsp;Edit</i></div>
+              {/* <div><i class="fa fa-edit">&nbsp;Edit</i></div> */}
               <div onClick={()=>deletePost(post._id)}><i className="fa fa-trash-o" >&nbsp;Delete</i></div>
             </div>
           )}
