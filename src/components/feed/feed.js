@@ -78,6 +78,7 @@ const Feed = () => {
     return(
     <div>
       <LoadingSpinner />
+      <Nodata />
     </div>
     )
   }
