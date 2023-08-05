@@ -46,7 +46,7 @@ const UploadForm = () => {
       });
 
       alert('File uploaded successfully');
-      navigate('/feed');
+      navigate('/');
       setName('');
       setDescription('');
       document.getElementById('file').value = '';

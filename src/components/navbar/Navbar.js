@@ -25,7 +25,7 @@ const Navbar = () => {
 
       <ul className="nav-list">
         <li>
-          <Link to="/feed" onClick={handleNavToggle}>
+          <Link to="/" onClick={handleNavToggle}>
             <i className="fa fa-home"></i>Home
           </Link>
         </li>
