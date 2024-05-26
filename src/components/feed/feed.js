@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './feed.css';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import LoadingSpinner from '../Loading/loading';
 import Nodata from '../NoData/Nodata';
 // import Cookies from 'js-cookie';
@@ -12,7 +12,7 @@ const Feed = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
   const { token } = useAuth()
-
+  const navigate = useNavigate();
   useEffect(() => {
    
     fetchData();
@@ -47,6 +47,7 @@ const Feed = () => {
     setShowOptions(!showOptions);
   };
 
+  //this is for deleting 
   // const deletePost = async (id) => {
   //   const confirmed = window.confirm('Are you sure you want to delete this post?');
   //   if (confirmed) {
@@ -63,7 +64,7 @@ const Feed = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       // Redirect to login page if token is not present
-      window.location.href = '/login';
+     navigate('/login');
     }
   }, []);
 
