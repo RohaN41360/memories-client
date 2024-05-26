@@ -1,8 +1,14 @@
 import React, { useState, useRef } from 'react';
 import './RegistrationForm.css';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../auth/auth';
+
 
 const RegistrationForm = () => {
+  
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -10,13 +16,16 @@ const RegistrationForm = () => {
     firstname: '',
     lastname: '',
     file: null,
-    previewfile:null
+    previewfile: null
   });
+
+  const {storeTokenInLocalStorage} = useAuth();
+  const [loading, setLoading] = useState(false); // State for loading indicator
   const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value
     }));
@@ -24,12 +33,14 @@ const RegistrationForm = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData(prevState => ({
-      ...prevState,
-      previewfile:URL.createObjectURL(file),
-      file: file,
-      
-    }));
+    if(file)
+    {
+      setFormData((prevState) => ({
+        ...prevState,
+        previewfile: URL.createObjectURL(file),
+        file: file
+      }));
+    }
     
   };
 
@@ -37,44 +48,62 @@ const RegistrationForm = () => {
     fileInputRef.current.click();
   };
 
-  const handleSubmit =async (e) => {
-    try{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
-    // http://localhost:5000
-    // https://memories-server-1iig.onrender.com/getusers 
-    const data = await axios.post('https://memories-server-1iig.onrender.com/newuser', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+    setLoading(true); // Set loading state to true when form is submitted
+    
+    try {
+      
+      if(formData.file === null)
+      {
+        toast.error("please add the user profile photo");
+        return;
+      }
+      
+      // https://memories-server-1iig.onrender.com/getusers
+      const data = await axios.post(
+        'https://memories-server-1iig.onrender.com/newuser',
+        // 'http://localhost:5000/newuser',
+        formData,
+        {
+           headers: {
+          "Content-Type": "multipart/form-data",
+        },
         }
-      });
-    console.log(formData);
-    console.log(data);
-    setFormData({
+      );
+      
+      setFormData({
         username: '',
         email: '',
         password: '',
         firstname: '',
         lastname: '',
         file: null,
-        previewfile:null
-    })
-    if(data)
-    {
-        alert(data.data.message)
+        previewfile: null
+      });
+      console.log(data)
+      if (data) {
+      
+        storeTokenInLocalStorage(data.data.token)
+        toast.success(data.data.message);
+        // window.location.href = '/login';
+      }
+    } catch (err) {
+      console.log(err);
+      toast.info(err.response.data.message);
+      // console.log(err.response.data.message);
+    } finally {
+      setLoading(false); // Reset loading state after receiving response from server
     }
-  }catch(err)
-  {
-    console.log(err)
-    alert(err.response.data.message)
-    console.log(err.response.data.message)
-  }
-    
   };
+
+  
 
   return (
     <div className="registration-form-container">
-      <h2>Sign up to Memories</h2>
+      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Sign up to Memories</h2>
+
+      <ToastContainer />
       <form onSubmit={handleSubmit}>
         <div className="profile-picture-container" onClick={handleCircleClick}>
           <div className="profile-picture">
@@ -149,7 +178,9 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <button className='signup' type="submit">Sign up</button>
+        <button className="signup" type="submit" disabled={loading}>
+          {loading ? 'Loading...' : 'Sign up'}
+        </button>
       </form>
     </div>
   );

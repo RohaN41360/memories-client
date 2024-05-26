@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './upload.css'
+import './upload.css';
 import LoadingSpinner from '../Loading/loading';
-
+import Cookies from 'js-cookie';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../auth/auth';
 
 const UploadForm = () => {
   const navigate = useNavigate();
@@ -13,18 +16,20 @@ const UploadForm = () => {
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
 
+  const {  user ,token} = useAuth();
+ 
+ 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
-    // console.log(file);
   };
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
+  useEffect(() => {
+    setName(user.firstname + " " + user.lastname); // Set name only once when component mounts
+  }, [user.firstname]);
 
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
-  };
+  } 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,22 +43,24 @@ const UploadForm = () => {
       formData.append('name', name);
       formData.append('description', description);
 
-      // http://localhost:5000 
-      await axios.post('https://memories-server-1iig.onrender.com/upload', formData, {
+      // const response = await axios.post('http://localhost:5000/upload', formData, {
+      const response = await axios.post('https://memories-server-1iig.onrender.com/upload', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+          Authorization: `${token}`,
+        },
+        
       });
-
-      alert('File uploaded successfully');
-      navigate('/');
-      setName('');
+    
+      alert(response.data.message)
+      navigate('/')
+      
       setDescription('');
-      document.getElementById('file').value = '';
+      setFile(null);
       
     } catch (error) {
-      console.error(error);
-      setError('An error occurred');
+      console.log(error);
+      setError(error.response.data.error);
     }
 
     setIsLoading(false);
@@ -64,36 +71,26 @@ const UploadForm = () => {
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
-      <div className="container">
-        <div className="title">Create A Post</div>
-        <form id="addpost" action="#" onSubmit={handleSubmit}>
-          <div className="user__details">
-            <div className="input__box">
-              <span className="details">Full Name</span>
-              <input type="text" value={name} onChange={handleNameChange} placeholder="E.g: John Smith" required />
-            </div>
-            <div className="input__box">
-              <span className="details">Description</span>
-              <input
-                id="description"
-
-                value={description}
-                onChange={handleDescriptionChange}
-                required
-              />
-            </div>
-            <div className="input__box">
-              <span className="details">Image</span>
-              <input type="file" id="file" onChange={handleFileChange} required />
-            </div>
+    <div className="upload-form-container">
+      <div className="form-wrapper">
+        <h2>Create A Post</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Full Name</label>
+            <input type="text" id="name" value={name}  placeholder="E.g: John Smith" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <input type="text" id="description" value={description} onChange={handleDescriptionChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="file">Image</label>
+            <input type="file"  id="file" onChange={handleFileChange} required />
           </div>
 
-          {error && <div className="error" style={{color:'red'}}>{error}</div>}
+          {/* {error && <div className="error">{error}</div>} */}
 
-          <div className="button">
-            <input type="submit" value="Register" />
-          </div>
+          <button type="submit">Submit</button>
         </form>
       </div>
     </div>

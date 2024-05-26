@@ -4,19 +4,28 @@ import './feed.css';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../Loading/loading';
 import Nodata from '../NoData/Nodata';
+import Cookies from 'js-cookie';
+import { useAuth } from "../auth/auth"
 
 const Feed = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
+  const { user , token } = useAuth()
 
   useEffect(() => {
+   
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://memories-server-1iig.onrender.com/getposts');
+      const response = await axios.get('https://memories-server-1iig.onrender.com/getposts',
+      {
+        headers: {
+          Authorization: `${token}`
+        }
+      });
       setData(response.data);
       setIsLoading(false);
     } catch (error) {
@@ -50,6 +59,14 @@ const Feed = () => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if token is not present
+      window.location.href = '/login';
+    }
+  }, []);
+
   if (isLoading) {
     return (
       <div>
@@ -73,7 +90,7 @@ const Feed = () => {
               <i className="fa fa-chevron-down" onClick={handleToggleOptions}></i>
               {showOptions && (
                 <div className="options-list" style={{ color: 'black' }}>
-                  <div onClick={() => deletePost(post._id)}><i className="fa fa-trash-o">&nbsp;Delete</i></div>
+                  <div /*onClick={() => deletePost(post._id)}*/><i className="fa fa-trash-o">&nbsp;Delete</i></div>
                 </div>
               )}
             </div>
@@ -90,7 +107,7 @@ const Feed = () => {
           <div className="social">
             <div className="social-content"></div>
             <div className="social-buttons">
-              <span><button onClick={() => updateLikes(post._id, post.likes + 1)}><i className="fa fa-thumbs-up"></i>{post.likes}</button></span>
+              <span><button onClick={() => updateLikes(post._id, post.likes + 1)}><i className="fa fa-thumbs-up"></i>{post.likes > 0  ? post.likes : 0   }</button></span>
               <span><button onClick={() => updateLikes(post._id, post.likes - 1)}><i className="fa fa-thumbs-down"></i></button></span>
               <span><i className="fa fa-comment"></i>Comment</span>
               <span><i className="fa fa-share"></i>Share</span>
