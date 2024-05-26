@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './navbar.css';
-import Cookies from 'js-cookie'; // Import js-cookie library
+// import Cookies from 'js-cookie'; // Import js-cookie library
 import { useAuth } from '../auth/auth';
 
 const Navbar = () => {

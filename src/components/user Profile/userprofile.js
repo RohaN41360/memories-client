@@ -9,7 +9,7 @@ const UserProfile = () => {
     
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+    console.log(loading)
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -33,11 +33,12 @@ const UserProfile = () => {
             } catch (error) {
                 console.error('Error fetching user posts:', error);
                 setLoading(false);
+                
             }
         };
 
         fetchUserPosts();
-    }, [user.username, token]); // Depend on user.username and token
+    }, [user.username, token,posts]); // Depend on user.username and token
 
     return (
         <div>

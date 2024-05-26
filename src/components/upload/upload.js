@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './upload.css';
 import LoadingSpinner from '../Loading/loading';
-import Cookies from 'js-cookie';
-import { ToastContainer, toast } from 'react-toastify';
+// import Cookies from 'js-cookie';
+// import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../auth/auth';
 
@@ -25,7 +25,7 @@ const UploadForm = () => {
 
   useEffect(() => {
     setName(user.firstname + " " + user.lastname); // Set name only once when component mounts
-  }, [user.firstname]);
+  }, [user.firstname,user.lastname]);
 
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
@@ -58,9 +58,9 @@ const UploadForm = () => {
       setDescription('');
       setFile(null);
       
-    } catch (error) {
-      console.log(error);
-      setError(error.response.data.error);
+    } catch (err) {
+      setError(err.response.data.error);
+      console.log(error)
     }
 
     setIsLoading(false);

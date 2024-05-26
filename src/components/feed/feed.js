@@ -4,19 +4,19 @@ import './feed.css';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../Loading/loading';
 import Nodata from '../NoData/Nodata';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import { useAuth } from "../auth/auth"
 
 const Feed = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
-  const { user , token } = useAuth()
+  const { token } = useAuth()
 
   useEffect(() => {
    
     fetchData();
-  }, []);
+  }, [data]);
 
   const fetchData = async () => {
     try {
@@ -47,17 +47,17 @@ const Feed = () => {
     setShowOptions(!showOptions);
   };
 
-  const deletePost = async (id) => {
-    const confirmed = window.confirm('Are you sure you want to delete this post?');
-    if (confirmed) {
-      try {
-        await axios.delete(`https://memories-server-1iig.onrender.com/delete/${id}`);
-        fetchData();
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
+  // const deletePost = async (id) => {
+  //   const confirmed = window.confirm('Are you sure you want to delete this post?');
+  //   if (confirmed) {
+  //     try {
+  //       await axios.delete(`https://memories-server-1iig.onrender.com/delete/${id}`);
+  //       fetchData();
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
