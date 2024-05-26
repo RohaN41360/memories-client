@@ -21,7 +21,7 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/user/${user.username}/posts`, {
+                const response = await axios.get(`https://memories-server-1iig.onrender.com/user/${user.username}/posts`, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `${token}`,
