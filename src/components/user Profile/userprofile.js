@@ -3,13 +3,15 @@ import './userprofile.css'; // Import your custom CSS for styling
 import { useAuth } from '../auth/auth';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
     const { user, token } = useAuth(); 
+    const navigate = useNavigate();
     
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    console.log(loading)
+    // console.log(loading)
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -28,7 +30,7 @@ const UserProfile = () => {
                     },
                 }); // Replace with your backend endpoint
                 setPosts(response.data.posts);
-                console.log(posts);
+               
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching user posts:', error);
@@ -38,7 +40,7 @@ const UserProfile = () => {
         };
 
         fetchUserPosts();
-    }, [user.username, token,posts]); // Depend on user.username and token
+    }, [user.username, token,navigate]); // Depend on user.username and token
 
     return (
         <div>
@@ -49,7 +51,7 @@ const UserProfile = () => {
                             <img src={user.profilePicture} alt="" />
                         </div>
                         <div className="profile-user-settings">
-                            <h1 className="profile-user-name">{user.username}</h1>
+                            <h1 className="profile-user-name">@{user.username}</h1>
                             <button className="btn profile-edit-btn">Edit Profile</button>
                             <button className="btn profile-settings-btn" aria-label="profile settings">
                                 <i className="fas fa-cog" aria-hidden="true"></i>
@@ -76,7 +78,7 @@ const UserProfile = () => {
                                 No posts yet. <Link to="/upload">Click Here to Add Post</Link>
                             </div>
                         ) : (
-                            posts.map(post => (
+                            posts.slice(0).reverse().map(post => (
                                 <div key={post._id} className="gallery-item" tabIndex="0">
                                     <img src={post.url} className="gallery-image" alt="" />
                                     <div className="gallery-item-info">

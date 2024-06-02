@@ -54,16 +54,16 @@ const RegistrationForm = () => {
     
     try {
       
-      if(formData.file === null)
-      {
-        toast.error("please add the user profile photo");
-        return;
-      }
+      // if(formData.file === null)
+      // {
+      //   toast.error("please add the user profile photo");
+      //   return;
+      // }
       
       // https://memories-server-1iig.onrender.com/getusers
       const data = await axios.post(
-        'https://memories-server-1iig.onrender.com/newuser',
-        // 'http://localhost:5000/newuser',
+        // 'https://memories-server-1iig.onrender.com/newuser',
+        'http://localhost:5000/newuser',
         formData,
         {
            headers: {
@@ -86,7 +86,7 @@ const RegistrationForm = () => {
       
         storeTokenInLocalStorage(data.data.token)
         toast.success(data.data.message);
-        // window.location.href = '/login';
+        window.location.href = '/';
       }
     } catch (err) {
       console.log(err);

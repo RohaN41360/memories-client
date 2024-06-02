@@ -160,3 +160,23 @@ body {
 .social-buttons span i {
   padding-right:4px;
 }
+
+.f-card {
+  /* Your existing styles */
+  border-radius: 15px; /* Apply rounded border to the posts */
+}
+
+.co-logo {
+  /* Your existing styles */
+  border-radius: 50%; /* Make the co-logo image circular */
+}
+
+.co-name > a {
+  /* Your existing styles */
+  font-family: Arial, sans-serif; /* Change font for the co-name */
+}
+
+.time, .options, .content {
+  /* Your existing styles */
+  font-family: Arial, sans-serif; /* Change font for time, options, and content */
+}

@@ -9,20 +9,22 @@ import { useAuth } from "../auth/auth"
 const Login = () => {
     const [usernameOrEmail, setUsernameOrEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {storeTokenInLocalStorage} = useAuth();
+    const [loading, setLoading] = useState(false); // State to track loading
+    const { storeTokenInLocalStorage } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Start loading indicator
 
         // Validation: Check if username/email and password are not empty
         if (!usernameOrEmail.trim() || !password.trim()) {
             toast.error('Please enter both username/email and password.');
+            setLoading(false); // Stop loading indicator
             return;
         }
 
         try {
             const response = await axios.post('https://memories-server-1iig.onrender.com/userlogin', {
-            // const response = await axios.post('http://localhost:5000/userlogin', {
                 usernameOrEmail: usernameOrEmail,
                 password: password
             });
@@ -32,15 +34,14 @@ const Login = () => {
             // Assuming the server responds with a token upon successful login
             const token = response.data.token;
             storeTokenInLocalStorage(token);
-            // localStorage.setItem('token',token);
-            
 
             // Redirect to a different page upon successful login
             window.location.href = '/'; 
         } catch (error) {
-            
             console.error('Error:', error);
             toast.error(error.response.data.message);
+        } finally {
+            setLoading(false); // Stop loading indicator regardless of success or failure
         }
     };
 
@@ -70,7 +71,9 @@ const Login = () => {
                     />
                 </div>
 
-                <button className='submitbtn' type="submit">Login</button>
+                <button className='submitbtn' type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
+                </button>
             </form>
         </div>
     );

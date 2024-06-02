@@ -19,7 +19,7 @@ const Navbar = () => {
     localStorage.clear('token');
     // Update login state
     
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   return (
