@@ -62,8 +62,8 @@ const RegistrationForm = () => {
       
       // https://memories-server-1iig.onrender.com/getusers
       const data = await axios.post(
-        'https://memories-server-1iig.onrender.com/newuser',
-        // 'http://localhost:5000/newuser',
+        // 'https://memories-server-1iig.onrender.com/newuser',
+        'http://localhost:5000/newuser',
         formData,
         {
            headers: {
@@ -100,9 +100,10 @@ const RegistrationForm = () => {
   
 
   return (
+    
     <div className="registration-form-container">
       <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Sign up to Memories</h2>
-
+      
       <ToastContainer />
       <form onSubmit={handleSubmit}>
         <div className="profile-picture-container" onClick={handleCircleClick}>

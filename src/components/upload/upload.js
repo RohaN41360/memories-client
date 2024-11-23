@@ -43,8 +43,8 @@ const UploadForm = () => {
       formData.append('name', name);
       formData.append('description', description);
 
-      // const response = await axios.post('http://localhost:5000/upload', formData, {
-      const response = await axios.post('https://memories-server-1iig.onrender.com/upload', formData, {
+      const response = await axios.post('http://localhost:5000/upload', formData, {
+      // const response = await axios.post('https://memories-server-1iig.onrender.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `${token}`,
@@ -91,6 +91,7 @@ const UploadForm = () => {
           {/* {error && <div className="error">{error}</div>} */}
 
           <button type="submit">Submit</button>
+          
         </form>
       </div>
     </div>

@@ -11,36 +11,34 @@ const UserProfile = () => {
     
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    // console.log(loading)
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
           // Redirect to login page if token is not present
           window.location.href = '/login';
         }
-      }, []);
-      
-    useEffect(() => {
-        const fetchUserPosts = async () => {
-            try {
-                const response = await axios.get(`https://memories-server-1iig.onrender.com/user/${user.username}/posts`, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: `${token}`,
-                    },
-                }); // Replace with your backend endpoint
-                setPosts(response.data.posts);
-               
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching user posts:', error);
-                setLoading(false);
-                
-            }
-        };
+    }, []);
 
+    const fetchUserPosts = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5000/user/${user.username}/posts`, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `${token}`,
+                },
+            }); 
+            setPosts(response.data.posts);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching user posts:', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchUserPosts();
-    }, [user.username, token,navigate]); // Depend on user.username and token
+    }, [user.username, token, navigate]); // Depend on user.username and token
 
     return (
         <div>
