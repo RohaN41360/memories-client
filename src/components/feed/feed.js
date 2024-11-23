@@ -27,7 +27,7 @@ const Feed = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/getposts', {
+      const response = await axios.get('https://memories-server-1iig.onrender.com/getposts', {
         headers: {
           Authorization: `${token}`,
         },
