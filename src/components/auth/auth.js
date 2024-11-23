@@ -16,8 +16,8 @@ export const AuthProvider = ({children})=>{
 
     const userAuthentication = async () =>{
         try {
-            // const response = await axios.get("https://memories-server-1iig.onrender.com/user", {
-            const response = await axios.get("http://localhost:5000/user", {
+            const response = await axios.get("https://memories-server-1iig.onrender.com/user", {
+            // const response = await axios.get("http://localhost:5000/user", {
                 headers: {
                     Authorization: `${token}`,
                 },

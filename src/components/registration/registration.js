@@ -62,8 +62,8 @@ const RegistrationForm = () => {
       
       // https://memories-server-1iig.onrender.com/getusers
       const data = await axios.post(
-        // 'https://memories-server-1iig.onrender.com/newuser',
-        'http://localhost:5000/newuser',
+        'https://memories-server-1iig.onrender.com/newuser',
+        // 'http://localhost:5000/newuser',
         formData,
         {
            headers: {
