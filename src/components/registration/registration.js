@@ -180,7 +180,7 @@ const RegistrationForm = () => {
           />
         </div>
         <button className="signup" type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Sign up'}
+          {loading ? 'Signing In...' : 'Sign up'}
         </button>
       </form>
     </div>

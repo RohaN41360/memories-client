@@ -76,16 +76,17 @@ const Feed = () => {
             {post.user && post.user.profilePicture && (
               <img
                 className="co-logo"
-                src={post.user.profilePicture || 'http://placehold.it/40x40'}
+                src={post.user.profilePicture}
                 alt="User Profile"
+                
               />
             )}
             <div className="co-name">
               <Link>{`${post.name.charAt(0).toUpperCase()}${post.name.slice(1)} Added a Post`}</Link>
             </div>
-            <div className="time">
+            {/* <div className="time">
               <Link>{post.createdAt.slice(2, 10)}</Link> <i className="fa fa-globe"></i>
-            </div>
+            </div> */}
             <div className="options" onClick={handleToggleOptions}>
               {showOptions && (
                 <div className="options-list" style={{ color: 'black' }}>

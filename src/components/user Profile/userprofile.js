@@ -1,33 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import './userprofile.css'; // Import your custom CSS for styling
+import './userprofile.css'; // Updated CSS file
 import { useAuth } from '../auth/auth';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
-    const { user, token } = useAuth(); 
+    const { user, token } =  useAuth();
     const navigate = useNavigate();
-    
+    const dummyimage = 'https://res.cloudinary.com/dxw6gft9d/image/upload/v1734781057/memories/kwtsycu7ozhjcmailiyz.jpg';
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
-          // Redirect to login page if token is not present
-          window.location.href = '/login';
+            window.location.href = '/login';
         }
     }, []);
 
     const fetchUserPosts = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/user/${user.username}/posts`, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `${token}`,
-                },
-            }); 
+            const response = await axios.get(
+                `http://localhost:5000/user/${user.username}/posts`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             setPosts(response.data.posts);
             setLoading(false);
         } catch (error) {
@@ -38,63 +40,78 @@ const UserProfile = () => {
 
     useEffect(() => {
         fetchUserPosts();
-    }, [user.username, token, navigate]); // Depend on user.username and token
+    }, [user.username, token, navigate]);
 
     return (
-        <div>
+        <div className="user-profile">
             <header>
                 <div className="container">
                     <div className="profile">
                         <div className="profile-image">
-                            <img src={user.profilePicture} alt="" />
+                            <img
+                                src={user.profilePicture}
+                                alt={`${user.username}'s profile`}
+                                onError={dummyimage}
+                            />
                         </div>
-                        <div className="profile-user-settings">
-                            <h1 className="profile-user-name">@{user.username}</h1>
-                            <button className="btn profile-edit-btn">Edit Profile</button>
-                            <button className="btn profile-settings-btn" aria-label="profile settings">
-                                <i className="fas fa-cog" aria-hidden="true"></i>
-                            </button>
+                        <div className="profile-user-details">
+                            <h1>@{user.username}</h1>
+                            <button className="btn btn-primary">Edit Profile</button>
                         </div>
                         <div className="profile-stats">
                             <ul>
-                                <li><span className="profile-stat-count">{user.posts ? user.posts.length : 0}</span> posts</li>
-                                <li><span className="profile-stat-count">0</span> followers</li>
-                                <li><span className="profile-stat-count">0</span> following</li>
+                                <li>
+                                    <span>{user.posts ? user.posts.length : 0}</span>
+                                    Posts
+                                </li>
+                                <li>
+                                    <span>0</span>
+                                    Followers
+                                </li>
+                                <li>
+                                    <span>0</span>
+                                    Following
+                                </li>
                             </ul>
                         </div>
                         <div className="profile-bio">
-                            <p><span className="profile-real-name">{user.firstname + " " + user.lastname}</span> Lorem ipsum dolor sit, amet consectetur adipisicing elit 📷✈️🏕️</p>
+                            <p>
+                                <strong>{`${user.firstname} ${user.lastname}`}</strong> Lorem
+                                ipsum dolor sit amet, consectetur adipiscing elit.
+                            </p>
                         </div>
                     </div>
                 </div>
             </header>
             <main>
                 <div className="container">
-                    <div className="gallery">
-                        {posts.length === 0 ? (
-                            <div className="no-posts" style={{textAlign:'center'}}>
-                                No posts yet. <Link to="/upload">Click Here to Add Post</Link>
-                            </div>
-                        ) : (
-                            posts.slice(0).reverse().map(post => (
-                                <div key={post._id} className="gallery-item" tabIndex="0">
-                                    <img src={post.url} className="gallery-image" alt="" />
+                    {loading ? (
+                        <div className="loader"></div>
+                    ) : posts.length === 0 ? (
+                        <div className="no-posts">
+                            <p>No posts yet.</p>
+                            <Link to="/upload" className="btn btn-secondary">
+                                Add Post
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="gallery">
+                            {posts.map((post) => (
+                                <div key={post._id} className="gallery-item">
+                                    <img src={post.url} alt="Post" className="gallery-image" />
                                     <div className="gallery-item-info">
-                                        <ul>
-                                            <li className="gallery-item-likes">
-                                                <span className="visually-hidden">Likes:</span>
-                                                <i className="fa fa-thumbs-up" aria-hidden="true"></i> {post.likes}
-                                            </li>
-                                            <li className="gallery-item-comments">
-                                                <span className="visually-hidden">Comments:</span>
-                                                <i className="fa fa-comment" aria-hidden="true"></i> {post.comments ? post.comments.length : 0}
-                                            </li>
-                                        </ul>
+                                        <p>
+                                            <i className="fa fa-thumbs-up"></i> {post.likes}
+                                        </p>
+                                        <p>
+                                            <i className="fa fa-comment"></i>{' '}
+                                            {post.comments ? post.comments.length : 0}
+                                        </p>
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

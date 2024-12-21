@@ -6,9 +6,13 @@ import { useAuth } from '../auth/auth';
 const Navbar = () => {
   const [navOpen, setNavOpen] = useState(false);
   const { isLoggedIn } = useAuth();
-
+  
   // Toggle the mobile menu
   const handleNavToggle = () => {
+    if(!isLoggedIn)
+    {
+      window.location.href = '/';
+    }
     setNavOpen(!navOpen);
   };
 
