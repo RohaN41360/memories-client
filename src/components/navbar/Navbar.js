@@ -9,10 +9,6 @@ const Navbar = () => {
   
   // Toggle the mobile menu
   const handleNavToggle = () => {
-    if(!isLoggedIn)
-    {
-      window.location.href = '/';
-    }
     setNavOpen(!navOpen);
   };
 
