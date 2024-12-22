@@ -3,7 +3,7 @@ import './login.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-
+import { API_URL } from '../../Config';
 import { useAuth } from "../auth/auth"
 
 const Login = () => {
@@ -24,12 +24,12 @@ const Login = () => {
         }
 
         try {
-            const response = await axios.post('https://memories-server-1iig.onrender.com/userlogin', {
+            const response = await axios.post(`${API_URL}/userlogin`, {
                 usernameOrEmail: usernameOrEmail,
                 password: password
             });
 
-            console.log(response.data); // Log the response data to the console
+            // console.log(response.data); // Log the response data to the console
             
             // Assuming the server responds with a token upon successful login
             const token = response.data.token;
@@ -38,7 +38,7 @@ const Login = () => {
             // Redirect to a different page upon successful login
             window.location.href = '/'; 
         } catch (error) {
-            console.error('Error:', error);
+            // console.error('Error:', error);
             toast.error(error.response.data.message);
         } finally {
             setLoading(false); // Stop loading indicator regardless of success or failure

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './navbar.css';
 import { useAuth } from '../auth/auth';
+import { API_URL } from '../../Config';
 
 const Navbar = () => {
   const [navOpen, setNavOpen] = useState(false);

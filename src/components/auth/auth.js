@@ -1,5 +1,6 @@
 import React, { useState , useEffect, createContext, useContext} from 'react';
 import axios from 'axios';
+import { API_URL } from '../../Config';
 
 export const AuthContext = createContext();
 
@@ -16,10 +17,10 @@ export const AuthProvider = ({children})=>{
 
     const userAuthentication = async () =>{
         try {
-            const response = await axios.get("https://memories-server-1iig.onrender.com/user", {
+            const response = await axios.get(`${API_URL}/user`, {
             // const response = await axios.get("http://localhost:5000/user", {
                 headers: {
-                    Authorization: `${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
             

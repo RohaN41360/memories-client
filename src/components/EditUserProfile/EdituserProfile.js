@@ -1,14 +1,16 @@
-import React, { useState, useRef } from 'react';
-import './RegistrationForm.css';
+import React, { useState, useEffect, useRef } from 'react';
+import './EditUserProfile.css';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../auth/auth';
 import { API_URL } from '../../Config';
+import { useNavigate } from 'react-router-dom';
 
-const RegistrationForm = () => {
-  
-  
+const EditProfile = () => {
+  const { token, user } = useAuth();  // Assuming user is fetched from context
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -19,9 +21,23 @@ const RegistrationForm = () => {
     previewfile: null
   });
 
-  const {storeTokenInLocalStorage} = useAuth();
   const [loading, setLoading] = useState(false); // State for loading indicator
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    // Pre-fill the form with current user data
+    if (user) {
+      setFormData({
+        username: user.username || '',
+        email: user.email || '',
+        password: '',
+        firstname: user.firstname || '',
+        lastname: user.lastname || '',
+        file: null,
+        previewfile: user.profilePicture || null
+      });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,67 +49,77 @@ const RegistrationForm = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if(file)
-    {
+    if (file) {
       setFormData((prevState) => ({
         ...prevState,
         previewfile: URL.createObjectURL(file),
         file: file
       }));
     }
-    
   };
 
   const handleCircleClick = () => {
     fileInputRef.current.click();
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading state to true when form is submitted
-    
+    setLoading(true);
+  
     try {
-      const data = await axios.post(
-        `${API_URL}/newuser`,
-        formData,
-        {
-           headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const data = new FormData();
+      data.append('username', formData.username);
+      data.append('email', formData.email);
+      data.append('firstname', formData.firstname);
+      data.append('lastname', formData.lastname);
+      if (formData.password) {
+        data.append('password', formData.password);
+      }
+      if (formData.file) {
+        data.append('file', formData.file);
+      }
+  
+      const response = await axios.patch(`${API_URL}/updateuserprofile/${user._id}`, data, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
         }
-      );
-      
+      });
+  
+      // Reset form data on success
       setFormData({
-        username: '',
-        email: '',
+        username: user.username || '',
+        email: user.email || '',
         password: '',
-        firstname: '',
-        lastname: '',
+        firstname: user.firstname || '',
+        lastname: user.lastname || '',
         file: null,
         previewfile: null
       });
-      // console.log(data)
-      if (data) {
-      
-        storeTokenInLocalStorage(data.data.token)
-        toast.success(data.data.message);
-        window.location.href = '/';
+  
+      // Show success toast message
+      if (response.data.message) {
+        toast.success(response.data.message); // This triggers the success toast
       }
     } catch (err) {
-      // console.log(err);
-      toast.info(err.response.data.message);
-      // console.log(err.response.data.message);
+      // Handle error case
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message); // Show error toast if there is an issue
+        
+      } else {
+        toast.error('Error updating profile');
+      }
     } finally {
-      setLoading(false); // Reset loading state after receiving response from server
+      setLoading(false);
+      const timer = setTimeout(() => {
+        navigate('/userprofile');
+      }, 4000);
+      setLoading(false);
     }
   };
-
   
-
   return (
-    
     <div className="registration-form-container">
-      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Sign up to Memories</h2>
+      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Edit Profile</h2>
       
       <ToastContainer />
       <form onSubmit={handleSubmit}>
@@ -137,17 +163,7 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        
         <div className="form-group">
           <label htmlFor="firstname">FirstName</label>
           <input
@@ -160,7 +176,7 @@ const RegistrationForm = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="LastName">LastName</label>
+          <label htmlFor="lastname">LastName</label>
           <input
             type="text"
             id="lastname"
@@ -170,12 +186,12 @@ const RegistrationForm = () => {
             required
           />
         </div>
-        <button className="signup" type="submit" disabled={loading}>
-          {loading ? 'Signing In...' : 'Sign up'}
+        <button className="Update" type="submit" disabled={loading}>
+          {loading ? 'Updating...' : 'Update Profile'}
         </button>
       </form>
     </div>
   );
 };
 
-export default RegistrationForm;
+export default EditProfile;

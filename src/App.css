@@ -1,0 +1,26 @@
+/* Hide scrollbar for the container */
+.container {
+    overflow-y: auto; /* Enable scrolling */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  
+  .container::-webkit-scrollbar {
+    width: 0; /* Chrome/Safari/WebKit */
+    height: 0; /* For horizontal scrollbars */
+    display: none; /* Completely hides scrollbar */
+  }
+  
+  /* Global settings for body if entire page scrolls */
+  body {
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  

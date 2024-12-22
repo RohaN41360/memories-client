@@ -4,52 +4,59 @@ import './feed.css';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../Loading/loading';
 import Nodata from '../NoData/Nodata';
-import { useAuth } from "../auth/auth"
+import { useAuth } from "../auth/auth";
+import { API_URL } from '../../Config';
 
 const Feed = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showOptions, setShowOptions] = useState(false);
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const navigate = useNavigate();
   const [likedPosts, setLikedPosts] = useState([]); // Track liked posts
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const dummyImage = 'https://res.cloudinary.com/dxw6gft9d/image/upload/v1734781057/memories/kwtsycu7ozhjcmailiyz.jpg';
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
+    } else {
+      fetchData();
     }
   }, [navigate]);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://memories-server-1iig.onrender.com/getposts', {
+      const response = await axios.get(`${API_URL}/getposts`, {
         headers: {
-          Authorization: `${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       setData(response.data);
       setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching posts:', error);
     }
   };
 
   const updateLikes = async (id, newLikes) => {
     try {
-      // Check if the post is already liked by the user
-      if (likedPosts.includes(id)) return; // Exit if the post is already liked
-      await axios.patch(`https://memories-server-1iig.onrender.com/getposts/${id}`, { likes: newLikes });
-      setLikedPosts([...likedPosts, id]); // Add post ID to liked posts
-      // Update likes count in the state
-      setData(data.map(post => post._id === id ? { ...post, likes: newLikes } : post));
+      if (likedPosts.includes(id)) return; // Prevent multiple likes
+      await axios.patch(`${API_URL}/getposts/${id}`, { likes: newLikes });
+      setLikedPosts([...likedPosts, id]);
+      setData((prevData) =>
+        prevData.map((post) =>
+          post._id === id ? { ...post, likes: newLikes } : post
+        )
+      );
     } catch (error) {
-      console.error(error);
+      console.error('Error updating likes:', error);
     }
+  };
+
+  const handleImgError = (e) => {
+    e.target.src = dummyImage;
   };
 
   const handleToggleOptions = () => {
@@ -57,11 +64,7 @@ const Feed = () => {
   };
 
   if (isLoading) {
-    return (
-      <div>
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (data.length === 0) {
@@ -73,33 +76,28 @@ const Feed = () => {
       {data.slice(0).reverse().map((post) => (
         <div className="f-card child" key={post._id}>
           <div className="header">
-            {post.user && post.user.profilePicture && (
-              <img
-                className="co-logo"
-                src={post.user.profilePicture}
-                alt="User Profile"
-                
-              />
-            )}
+            <img
+              className="co-logo"
+              src={post.user?.profilePicture || dummyImage}
+              alt="User Profile"
+              onError={handleImgError}
+            />
             <div className="co-name">
-              <Link>{`${post.name.charAt(0).toUpperCase()}${post.name.slice(1)} Added a Post`}</Link>
-            </div>
-            {/* <div className="time">
-              <Link>{post.createdAt.slice(2, 10)}</Link> <i className="fa fa-globe"></i>
-            </div> */}
-            <div className="options" onClick={handleToggleOptions}>
-              {showOptions && (
-                <div className="options-list" style={{ color: 'black' }}>
-                  <div><i className="fa fa-trash-o">&nbsp;Delete</i></div>
-                </div>
-              )}
+              <Link>
+                {post.name ? `${post.name.charAt(0).toUpperCase()}${post.name.slice(1)}` : 'User'}{' '}
+              </Link>
             </div>
           </div>
           <div className="content">
-            <p>{post.description}</p>
+            <p>{post.description || 'No description available.'}</p>
           </div>
           <div className="reference">
-            <img className="reference-thumb" src={post.url} alt={post.name} />
+            <img
+              className="reference-thumb"
+              src={post.url || dummyImage}
+              alt={post.name || 'Post Image'}
+              onError={handleImgError}
+            />
           </div>
           <div className="social">
             <div className="social-content"></div>

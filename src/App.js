@@ -11,6 +11,8 @@ import RegistrationForm from './components/registration/registration';
 import Login from './components/login/login';
 import Auth from "./components/auth/auth"
 import Userprofile from './components/user Profile/userprofile';
+import { API_URL } from './Config';
+import EditProfile from './components/EditUserProfile/EdituserProfile';
 
 function App() {
   
@@ -26,6 +28,7 @@ function App() {
         <Route path="/upload" element={<UploadForm />} />
         <Route path="/userregistration" element={<RegistrationForm />} />
         <Route path="/userprofile" element={<Userprofile />} />
+        <Route path="/editprofile" element={<EditProfile />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
     </Router>
