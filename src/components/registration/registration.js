@@ -5,10 +5,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from '../auth/auth';
 import { API_URL } from '../../Config';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrationForm = () => {
-  
-  
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -19,29 +20,26 @@ const RegistrationForm = () => {
     previewfile: null
   });
 
-  const {storeTokenInLocalStorage} = useAuth();
-  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value 
     }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if(file)
-    {
+    if(file) {
       setFormData((prevState) => ({
         ...prevState,
         previewfile: URL.createObjectURL(file),
         file: file
       }));
     }
-    
   };
 
   const handleCircleClick = () => {
@@ -50,19 +48,40 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading state to true when form is submitted
+    setLoading(true);
     
     try {
-      const data = await axios.post(
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== null) {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      const response = await axios.post(
         `${API_URL}/newuser`,
-        formData,
+        formDataToSend,
         {
-           headers: {
-          "Content-Type": "multipart/form-data",
-        },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
+
+      if (!response || !response.data) {
+        throw new Error('Invalid response from server');
+      }
+
+      const { token, user } = response.data;
+      if (!token) {
+        throw new Error('No token received from server');
+      }
+
+      // Use the login function from auth context
+      login(user, token);
+      toast.success('Registration successful!');
       
+      // Clear form data
       setFormData({
         username: '',
         email: '',
@@ -72,37 +91,42 @@ const RegistrationForm = () => {
         file: null,
         previewfile: null
       });
-      // console.log(data)
-      if (data) {
-      
-        storeTokenInLocalStorage(data.data.token)
-        toast.success(data.data.message);
-        window.location.href = '/';
-      }
-    } catch (err) {
-      // console.log(err);
-      toast.info(err.response.data.message);
-      // console.log(err.response.data.message);
+
+      // Navigate after a short delay to allow the toast to be seen
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      toast.error(errorMessage);
     } finally {
-      setLoading(false); // Reset loading state after receiving response from server
+      setLoading(false);
     }
   };
 
-  
-
   return (
-    
     <div className="registration-form-container">
-      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Sign up to Memories</h2>
-      
-      <ToastContainer />
+      <h2>Join Memories</h2>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <form onSubmit={handleSubmit}>
         <div className="profile-picture-container" onClick={handleCircleClick}>
           <div className="profile-picture">
             {formData.previewfile ? (
               <img src={formData.previewfile} alt="Profile" className="profile-preview" />
             ) : (
-              <div className="empty-profile-circle">Add the Profile Picture</div>
+              <div className="empty-profile-circle">Add Profile Picture</div>
             )}
           </div>
           <input
@@ -116,62 +140,68 @@ const RegistrationForm = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Create Username</label>
           <input
             type="text"
             id="username"
             name="username"
             value={formData.username}
             onChange={handleChange}
+            placeholder="Choose a unique username"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Email Address</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
+            placeholder="Enter your email"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Create Password</label>
           <input
             type="password"
             id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
+            placeholder="Choose a strong password"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="firstname">FirstName</label>
+          <label htmlFor="firstname">First Name</label>
           <input
             type="text"
             id="firstname"
             name="firstname"
             value={formData.firstname}
             onChange={handleChange}
+            placeholder="Enter your first name"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="LastName">LastName</label>
+          <label htmlFor="lastname">Last Name</label>
           <input
             type="text"
             id="lastname"
             name="lastname"
             value={formData.lastname}
             onChange={handleChange}
+            placeholder="Enter your last name"
             required
           />
         </div>
-        <button className="signup" type="submit" disabled={loading}>
-          {loading ? 'Signing In...' : 'Sign up'}
+
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
     </div>

@@ -1,5 +1,7 @@
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -9,27 +11,44 @@ body {
 
 .nav {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: #1A237E;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Ensures space between title and menu */
-  position: relative; /* This allows the menu to be overlayed */
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .nav-header {
-  padding-left: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .nav-title {
-  font-size: 22px;
-  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.nav-title a {
+  color: #1a237e;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-title a:hover {
+  color: #3949ab;
 }
 
 .nav-list {
   display: flex;
   gap: 2rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-list > li {
@@ -38,80 +57,125 @@ body {
 
 .nav-list > li a {
   text-decoration: none;
-  color: white;
+  color: #333;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.nav-list > li a:hover {
+  background-color: #f5f5f5;
+  color: #1a237e;
+}
+
+.nav-btn {
+  display: none;
+}
+
+.nav-link-button {
+  background: none;
+  border: none;
+  color: #333;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-link-button:hover {
+  background-color: #f5f5f5;
+  color: #1a237e;
 }
 
 /* Mobile view */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .nav {
     padding: 1rem;
-    position: relative; /* Ensure the nav is the containing block for the menu */
+    position: relative;
   }
 
-  /* Hamburger icon (nav button) */
   .nav-btn {
-    display: inline-block;
-    position: absolute;
-    right: 10px;
-    top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
     cursor: pointer;
+    padding: 0;
+    position: relative;
+    z-index: 1001;
   }
 
   .nav-btn span {
     display: block;
-    width: 30px;
-    height: 3px;
-    background-color: #eee;
-    margin: 5px 0;
+    width: 25px;
+    height: 2px;
+    background-color: #1a237e;
+    margin: 4px 0;
+    transition: all 0.3s ease;
   }
 
-  /* Mobile menu (nav-list) */
+  .nav-open .nav-btn span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .nav-open .nav-btn span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-open .nav-btn span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
   .nav-list {
-    position: absolute;
-    display: flex;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 80%;
+    max-width: 300px;
+    background-color: #ffffff;
     flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    background-color: #1A237E;
-    height: 0;
-    top: 60px; /* Adjust the space from the top */
-    left: 0;
-    overflow: hidden;
-    padding: 0;
-    z-index: 10; /* Ensures the menu overlays the content */
-    transition: all 0.3s ease-in;
+    padding: 80px 2rem 2rem;
+    gap: 1.5rem;
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
   }
 
-  .nav-list-open {
-    height: calc(100vh - 50px); /* Full screen height minus the navbar */
-    padding: 10px;
+  .nav-open .nav-list {
+    right: 0;
   }
 
   .nav-list > li {
     width: 100%;
-    margin-top: 1.5rem;
   }
 
-  .nav-list a {
-    padding: 10px;
-    font-size: 16px;
-    color: white;
-    text-decoration: none;
-    text-align: center;
+  .nav-list > li a {
+    display: block;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 1.1rem;
   }
 
-  .nav-list a:hover {
-    background-color: #365899;
+  .nav-list > li a:hover {
+    background-color: #f5f5f5;
   }
 
-  /* Disable scrolling on body when menu is open */
-  body {
-    overflow: hidden; /* This will prevent content scrolling when the menu is open */
+  body.nav-open {
+    overflow: hidden;
   }
-  
-  /* Allow scrolling again when menu is closed */
-  .nav-list-open + * {
-    pointer-events: none; /* Disable interactions with content below */
+
+  .nav-link-button {
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
   }
 }

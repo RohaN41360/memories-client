@@ -1,49 +1,286 @@
 .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  h2 {
-    text-align: center;
-    color: #333;
-  }
-  
-  form {
+    min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
     display: flex;
     flex-direction: column;
-  }
-  
-  .input-group {
-    margin-bottom: 20px;
-  }
-  
-  label {
-    font-weight: bold;
-  }
-  
-  input[type="text"],
-  input[type="password"] {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  .submitbtn {
-    background-color: #007bff;
-    color: #fff;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container h2 {
+    color: #1a237e;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+    text-align: center;
+    background: linear-gradient(45deg, #1a237e, #3949ab);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.login-container form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+}
+
+.input-group {
+    margin-bottom: 1.8rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #1a237e;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.input-group input:focus {
+    border-color: #1a237e;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+    background-color: #fff;
+}
+
+.input-group input::placeholder {
+    color: #9e9e9e;
+    font-size: 0.95rem;
+}
+
+.submitbtn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(45deg, #1a237e, #3949ab);
+    color: white;
     border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    font-size: 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-  }
-  
-  .submitbtn:hover {
-    background-color: #0056b3;
-  }
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.submitbtn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+}
+
+.submitbtn:disabled {
+    background: linear-gradient(45deg, #9fa8da, #c5cae9);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login-footer {
+    margin-top: 2rem;
+    text-align: center;
+    color: #666;
+}
+
+.login-footer a {
+    color: #1a237e;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+    color: #3949ab;
+}
+
+/* Toast Customization */
+.Toastify__toast-container {
+    width: auto;
+    max-width: 380px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.Toastify__toast {
+    border-radius: 16px;
+    padding: 0.75rem 1.25rem;
+    margin: 0.75rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: white;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.3px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Toastify__toast-body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.Toastify__toast-body > div:last-child {
+    flex: 1;
+    white-space: normal;
+    word-break: normal;
+}
+
+.Toastify__toast-icon {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.Toastify__toast--success {
+    background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+}
+
+.Toastify__toast--error {
+    background: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%);
+}
+
+.Toastify__toast--warning {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+}
+
+.Toastify__toast--info {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+}
+
+.Toastify__progress-bar {
+    height: 4px;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 16px 16px;
+}
+
+.Toastify__progress-bar--success {
+    background: linear-gradient(to right, #00b09b, #96c93d);
+}
+
+.Toastify__progress-bar--error {
+    background: linear-gradient(to right, #ff5f6d, #ffc371);
+}
+
+.Toastify__progress-bar--warning {
+    background: linear-gradient(to right, #f6d365, #fda085);
+}
+
+.Toastify__progress-bar--info {
+    background: linear-gradient(to right, #2193b0, #6dd5ed);
+}
+
+.Toastify__close-button {
+    color: white;
+    opacity: 0.7;
+    padding: 0;
+    margin-left: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.Toastify__close-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Toast Animation */
+.Toastify__toast--enter {
+    transform: translate3d(0, 100%, 0) scale(0.9);
+    opacity: 0;
+}
+
+.Toastify__toast--enter-active {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.Toastify__toast--exit {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+}
+
+.Toastify__toast--exit-active {
+    transform: translate3d(0, 100%, 0) scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1.5rem;
+    }
+
+    .login-container h2 {
+        font-size: 2.4rem;
+    }
+
+    .login-container form {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .login-container h2 {
+        font-size: 2rem;
+    }
+
+    .login-container form {
+        padding: 1.5rem;
+    }
+
+    .input-group input {
+        padding: 0.9rem 1rem;
+    }
+
+    .submitbtn {
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+
+    .Toastify__toast-container {
+        width: calc(100% - 32px);
+        padding: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 auto;
+    }
+
+    .Toastify__toast {
+        margin: 0.5rem auto;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+}
   

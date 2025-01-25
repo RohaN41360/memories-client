@@ -1,197 +1,243 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './EditUserProfile.css';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import './EditUserProfile.css';
 import { useAuth } from '../auth/auth';
 import { API_URL } from '../../Config';
-import { useNavigate } from 'react-router-dom';
+import Toast from '../Toast/Toast';
 
-const EditProfile = () => {
-  const { token, user } = useAuth();  // Assuming user is fetched from context
-  const navigate = useNavigate();
+const EditUserProfile = () => {
+    const navigate = useNavigate();
+    const { user, token, updateUser } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [toast, setToast] = useState(null);
+    
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        firstname: '',
+        lastname: '',
+        bio: '',
+        file: null
+    });
 
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    firstname: '',
-    lastname: '',
-    file: null,
-    previewfile: null
-  });
+    const [previewImage, setPreviewImage] = useState('');
 
-  const [loading, setLoading] = useState(false); // State for loading indicator
-  const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    // Pre-fill the form with current user data
-    if (user) {
-      setFormData({
-        username: user.username || '',
-        email: user.email || '',
-        password: '',
-        firstname: user.firstname || '',
-        lastname: user.lastname || '',
-        file: null,
-        previewfile: user.profilePicture || null
-      });
-    }
-  }, [user]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData((prevState) => ({
-        ...prevState,
-        previewfile: URL.createObjectURL(file),
-        file: file
-      }));
-    }
-  };
-
-  const handleCircleClick = () => {
-    fileInputRef.current.click();
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-  
-    try {
-      const data = new FormData();
-      data.append('username', formData.username);
-      data.append('email', formData.email);
-      data.append('firstname', formData.firstname);
-      data.append('lastname', formData.lastname);
-      if (formData.password) {
-        data.append('password', formData.password);
-      }
-      if (formData.file) {
-        data.append('file', formData.file);
-      }
-  
-      const response = await axios.patch(`${API_URL}/updateuserprofile/${user._id}`, data, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "multipart/form-data"
+    useEffect(() => {
+        // Redirect if not logged in
+        if (!token) {
+            navigate('/login');
+            return;
         }
-      });
-  
-      // Reset form data on success
-      setFormData({
-        username: user.username || '',
-        email: user.email || '',
-        password: '',
-        firstname: user.firstname || '',
-        lastname: user.lastname || '',
-        file: null,
-        previewfile: null
-      });
-  
-      // Show success toast message
-      if (response.data.message) {
-        toast.success(response.data.message); // This triggers the success toast
-      }
-    } catch (err) {
-      // Handle error case
-      if (err.response && err.response.data && err.response.data.message) {
-        toast.error(err.response.data.message); // Show error toast if there is an issue
-        
-      } else {
-        toast.error('Error updating profile');
-      }
-    } finally {
-      setLoading(false);
-      const timer = setTimeout(() => {
-        navigate('/userprofile');
-      }, 4000);
-      setLoading(false);
+
+        // Initialize form data when user data is available
+        if (user) {
+            setFormData({
+                username: user.username || '',
+                email: user.email || '',
+                firstname: user.firstname || '',
+                lastname: user.lastname || '',
+                bio: user.bio || '',
+                file: null
+            });
+            setPreviewImage(user.profilePicture || '');
+            setLoading(false);
+        }
+    }, [user, token, navigate]);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                showToast('File size should be less than 5MB', 'error');
+                return;
+            }
+            setFormData(prev => ({
+                ...prev,
+                file
+            }));
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const submitData = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (formData[key] !== '' && formData[key] !== null) {
+                    submitData.append(key, formData[key]);
+                }
+            });
+
+            const response = await axios.patch(
+                `${API_URL}/updateuserprofile/${user._id}`,
+                submitData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.data && response.data.user) {
+                // Update the user context with new data
+                updateUser(response.data.user);
+                showToast('Profile updated successfully', 'success');
+                
+                // Wait for the toast to be visible before navigating
+                setTimeout(() => {
+                    navigate('/userprofile');
+                }, 2000);
+            } else {
+                throw new Error('Invalid response from server');
+            }
+
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Error updating profile';
+            showToast(errorMessage, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="edit-profile-container">
+                <div className="edit-profile-card">
+                    <div className="loading-spinner">Getting things ready...</div>
+                </div>
+            </div>
+        );
     }
-  };
-  
-  return (
-    <div className="registration-form-container">
-      <h2 style={{ textAlign: 'center', fontSize: '24px', color: '#333', marginBottom: '20px', textTransform: 'uppercase' }}>Edit Profile</h2>
-      
-      <ToastContainer />
-      <form onSubmit={handleSubmit}>
-        <div className="profile-picture-container" onClick={handleCircleClick}>
-          <div className="profile-picture">
-            {formData.previewfile ? (
-              <img src={formData.previewfile} alt="Profile" className="profile-preview" />
-            ) : (
-              <div className="empty-profile-circle">Add the Profile Picture</div>
+
+    return (
+        <div className="edit-profile-container">
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
             )}
-          </div>
-          <input
-            type="file"
-            id="file"
-            name="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-          />
+            <div className="edit-profile-card">
+                <h2>Make Your Profile Awesome</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="profile-picture-section">
+                        <img
+                            src={previewImage}
+                            alt="Profile"
+                            className="profile-preview"
+                        />
+                        <div className="upload-button-wrapper">
+                            <input
+                                type="file"
+                                id="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                style={{ display: 'none' }}
+                            />
+                            <label htmlFor="file" className="upload-button">
+                                Update Profile Picture
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Create Your Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                            placeholder="Make it unique and memorable"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Your Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            placeholder="Where can we reach you?"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>First Name</label>
+                        <input
+                            type="text"
+                            name="firstname"
+                            value={formData.firstname}
+                            onChange={handleChange}
+                            required
+                            placeholder="What should we call you?"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Last Name</label>
+                        <input
+                            type="text"
+                            name="lastname"
+                            value={formData.lastname}
+                            onChange={handleChange}
+                            required
+                            placeholder="Complete your name"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Express Yourself</label>
+                        <textarea
+                            name="bio"
+                            value={formData.bio}
+                            onChange={handleChange}
+                            placeholder="Tell your story in a few words..."
+                            rows="4"
+                        />
+                    </div>
+
+                    <div className="button-group">
+                        <button 
+                            type="submit" 
+                            className={`submit-button ${loading ? 'loading' : ''}`}
+                            disabled={loading}
+                        >
+                            {loading ? 'Saving...' : 'Save'}
+                        </button>
+                        <button 
+                            type="button" 
+                            className="cancel-button"
+                            onClick={() => navigate('/userprofile')}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="firstname">FirstName</label>
-          <input
-            type="text"
-            id="firstname"
-            name="firstname"
-            value={formData.firstname}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastname">LastName</label>
-          <input
-            type="text"
-            id="lastname"
-            name="lastname"
-            value={formData.lastname}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button className="Update" type="submit" disabled={loading}>
-          {loading ? 'Updating...' : 'Update Profile'}
-        </button>
-      </form>
-    </div>
-  );
+    );
 };
 
-export default EditProfile;
+export default EditUserProfile;

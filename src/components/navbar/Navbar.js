@@ -1,28 +1,55 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './navbar.css';
 import { useAuth } from '../auth/auth';
-import { API_URL } from '../../Config';
 
 const Navbar = () => {
   const [navOpen, setNavOpen] = useState(false);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, logout, isLoading } = useAuth();
+  const navigate = useNavigate();
   
   // Toggle the mobile menu
   const handleNavToggle = () => {
     setNavOpen(!navOpen);
+    document.body.classList.toggle('nav-open');
   };
 
   // Close the menu when a link is clicked
   const closeMenu = () => {
     setNavOpen(false);
+    document.body.classList.remove('nav-open');
   };
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.clear('token');
-    window.location.href = '/';
+    closeMenu();
+    logout();
+    navigate('/login');
   };
+
+  // Close menu on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && navOpen) {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [navOpen]);
+
+  // Clean up body class on unmount
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('nav-open');
+    };
+  }, []);
+
+  // Don't render navigation while checking authentication
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <nav className={`nav ${navOpen ? 'nav-open' : ''}`}>
@@ -32,25 +59,23 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Hamburger button for mobile */}
-      <div className="nav-btn" onClick={handleNavToggle}>
+      <button className="nav-btn" onClick={handleNavToggle} aria-label="Toggle menu">
         <span></span>
         <span></span>
         <span></span>
-      </div>
+      </button>
 
-      {/* Navigation links */}
-      <ul className={`nav-list ${navOpen ? 'nav-list-open' : ''}`}>
+      <ul className="nav-list">
         {!isLoggedIn ? (
           <>
             <li>
               <Link to="/userregistration" onClick={closeMenu}>
-                Register
+                Join Now
               </Link>
             </li>
             <li>
               <Link to="/login" onClick={closeMenu}>
-                Login
+                Sign In
               </Link>
             </li>
           </>
@@ -58,23 +83,28 @@ const Navbar = () => {
           <>
             <li>
               <Link to="/" onClick={closeMenu}>
-                Home
+                Feed
               </Link>
             </li>
             <li>
               <Link to="/upload" onClick={closeMenu}>
-                Create Post
+                Share Memory
               </Link>
             </li>
             <li>
               <Link to="/userprofile" onClick={closeMenu}>
-                Profile
+                My Space
               </Link>
             </li>
             <li>
-              <Link to="/" onClick={handleLogout}>
-                Logout
+              <Link to="/search" onClick={closeMenu}>
+                Discover
               </Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="nav-link-button">
+                Sign Out
+              </button>
             </li>
           </>
         )}

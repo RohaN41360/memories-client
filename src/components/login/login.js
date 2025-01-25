@@ -5,58 +5,96 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { API_URL } from '../../Config';
 import { useAuth } from "../auth/auth"
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [usernameOrEmail, setUsernameOrEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false); // State to track loading
-    const { storeTokenInLocalStorage } = useAuth();
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        usernameOrEmail: '',
+        password: ''
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Start loading indicator
-
-        // Validation: Check if username/email and password are not empty
-        if (!usernameOrEmail.trim() || !password.trim()) {
-            toast.error('Please enter both username/email and password.');
-            setLoading(false); // Stop loading indicator
+        
+        if (!formData.usernameOrEmail || !formData.password) {
+            toast.error('Please fill in all fields');
             return;
         }
 
+        setLoading(true);
+
         try {
-            const response = await axios.post(`${API_URL}/userlogin`, {
-                usernameOrEmail: usernameOrEmail,
-                password: password
-            });
-
-            // console.log(response.data); // Log the response data to the console
+            const response = await axios.post(`${API_URL}/userlogin`, formData);
             
-            // Assuming the server responds with a token upon successful login
-            const token = response.data.token;
-            storeTokenInLocalStorage(token);
+            if (!response || !response.data) {
+                throw new Error('Invalid response from server');
+            }
+            
+            const { token, user } = response.data;
+            if (!token || !user) {
+                throw new Error('Invalid login response');
+            }
 
-            // Redirect to a different page upon successful login
-            window.location.href = '/'; 
+            login(user, token);
+            toast.success('Login successful');
+            setTimeout(() => {
+                navigate('/');
+            }, 1500);
         } catch (error) {
-            // console.error('Error:', error);
-            toast.error(error.response.data.message);
+            console.error('Login error:', error);
+            
+            if (error.response) {
+                // Server responded with an error
+                switch (error.response.status) {
+                    case 401:
+                        toast.error('Invalid username/email or password');
+                        break;
+                    case 404:
+                        toast.error('User not found');
+                        break;
+                    case 500:
+                        toast.error('Server error. Please try again later');
+                        break;
+                    default:
+                        toast.error(error.response.data?.message || 'Login failed');
+                }
+            } else if (error.request) {
+                // Request was made but no response
+                toast.error('No response from server. Please check your internet connection');
+            } else {
+                // Error in request setup
+                toast.error('Error setting up request. Please try again');
+            }
         } finally {
-            setLoading(false); // Stop loading indicator regardless of success or failure
+            setLoading(false);
         }
     };
 
     return (
         <div className="login-container">
-            <h2>Login</h2>
-            <ToastContainer />
+            <h2>Sign In</h2>
+            <ToastContainer 
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={true}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <form onSubmit={handleSubmit}>
                 <div className="input-group">
                     <label htmlFor="usernameOrEmail">Username or Email</label>
                     <input
                         type="text"
                         id="usernameOrEmail"
-                        value={usernameOrEmail}
-                        onChange={(e) => setUsernameOrEmail(e.target.value)}
+                        value={formData.usernameOrEmail}
+                        onChange={(e) => setFormData({ ...formData, usernameOrEmail: e.target.value })}
                         placeholder="Enter your username or email"
                     />
                 </div>
@@ -65,14 +103,14 @@ const Login = () => {
                     <input
                         type="password"
                         id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         placeholder="Enter your password"
                     />
                 </div>
 
                 <button className='submitbtn' type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
+                    {loading ? 'Signing in...' : 'Sign In'}
                 </button>
             </form>
         </div>
